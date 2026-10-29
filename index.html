@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Buku Menu - Hantaleya Cafe</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background-color: #f8f9fa; /* Putih bersih */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      header {
+        width: 100%;
+        padding: 15px;
+        text-align: center;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      header h1 {
+        color: #b91c1c; /* Merah Hantaleya */
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      /* Container Buku Menu */
+      .book-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px; /* Ukuran optimal untuk baca menu */
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #e9ecef;
+      }
+
+      .menu-slide {
+        width: 100%;
+        display: none;
+        animation: fadeEffect 0.4s ease-in-out;
+      }
+
+      .menu-slide.active {
+        display: block;
+      }
+
+      .menu-slide img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      @keyframes fadeEffect {
+        from {
+          opacity: 0;
+          transform: scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Navigasi Bawah (Glassmorphism Putih-Merah) */
+      .controls {
+        width: 100%;
+        max-width: 600px;
+        padding: 15px 20px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(185, 28, 28, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+      }
+
+      .btn-nav {
+        background: #fff;
+        color: #b91c1c;
+        border: 2px solid #b91c1c;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+      }
+
+      .btn-nav:hover,
+      .btn-nav:active {
+        background: #b91c1c;
+        color: #fff;
+      }
+
+      .btn-nav:disabled {
+        border-color: #ccc;
+        color: #ccc;
+        cursor: not-allowed;
+        background: transparent;
+      }
+
+      .page-indicator {
+        color: #333;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      /* Instruksi Swipe */
+      .swipe-hint {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+        z-index: 5;
+      }
+
+      .swipe-hint.hide {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>HANTALEYA CAFE</h1>
+    </header>
+
+    <div class="book-container" id="bookContainer">
+      <!-- Hint untuk user HP -->
+      <div class="swipe-hint" id="swipeHint">Geser untuk membuka halaman</div>
+
+      <!-- Gambar Menu Halaman 1 sampai 6 -->
+      <div class="menu-slide active">
+        <img src="aset/menu-1.jpg" alt="Menu Halaman 1" />
+      </div>
+      <div class="menu-slide">
+        <img src="aset/menu-2.jpg" alt="Menu Halaman 2" />
+      </div>
+      <div class="menu-slide">
+        <img src="aset/menu-3.jpg" alt="Menu Halaman 3" />
+      </div>
+      <div class="menu-slide">
+        <img src="aset/menu-4.jpg" alt="Menu Halaman 4" />
+      </div>
+      <div class="menu-slide">
+        <img src="aset/menu-5.jpg" alt="Menu Halaman 5" />
+      </div>
+      <div class="menu-slide">
+        <img src="aset/menu-6.jpg" alt="Menu Halaman 6" />
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-nav" id="prevBtn" onclick="changePage(-1)" disabled>
+        &#8592; Prev
+      </button>
+      <div class="page-indicator" id="pageIndicator">Hal 1 / 6</div>
+      <button class="btn-nav" id="nextBtn" onclick="changePage(1)">
+        Next &#8594;
+      </button>
+    </div>
+
+    <script>
+      let currentPage = 0;
+      const slides = document.querySelectorAll(".menu-slide");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const pageIndicator = document.getElementById("pageIndicator");
+      const swipeHint = document.getElementById("swipeHint");
+      const totalPages = slides.length;
+
+      function updateUI() {
+        // Sembunyikan semua, tampilkan yang aktif
+        slides.forEach((slide, index) => {
+          slide.classList.remove("active");
+          if (index === currentPage) {
+            slide.classList.add("active");
+          }
+        });
+
+        // Update Teks Indikator
+        pageIndicator.innerText = `Hal ${currentPage + 1} / ${totalPages}`;
+
+        // Atur tombol Prev/Next
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = currentPage === totalPages - 1;
+      }
+
+      function changePage(direction) {
+        // Sembunyikan hint saat user mulai interaksi
+        swipeHint.classList.add("hide");
+
+        currentPage += direction;
+        if (currentPage < 0) currentPage = 0;
+        if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+        updateUI();
+      }
+
+      // --- Logika Swipe untuk Touchscreen (Mobile) ---
+      let touchStartX = 0;
+      let touchEndX = 0;
+      const bookContainer = document.getElementById("bookContainer");
+
+      bookContainer.addEventListener(
+        "touchstart",
+        (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        },
+        { passive: true },
+      );
+
+      bookContainer.addEventListener(
+        "touchend",
+        (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+        },
+        { passive: true },
+      );
+
+      function handleSwipe() {
+        const swipeThreshold = 50; // Jarak minimal gesekan
+        swipeHint.classList.add("hide"); // Sembunyikan hint jika user sudah swipe
+
+        if (touchStartX - touchEndX > swipeThreshold) {
+          // Swipe ke kiri (Next)
+          if (currentPage < totalPages - 1) changePage(1);
+        }
+        if (touchEndX - touchStartX > swipeThreshold) {
+          // Swipe ke kanan (Prev)
+          if (currentPage > 0) changePage(-1);
+        }
+      }
+    </script>
+  </body>
+</html>
